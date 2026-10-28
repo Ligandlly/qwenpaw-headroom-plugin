@@ -1,0 +1,28 @@
+{
+  "id": "headroom",
+  "name": {
+    "zh-CN": "Headroom 上下文压缩",
+    "en-US": "Headroom Context Compression"
+  },
+  "version": "1.0.0",
+  "type": "general",
+  "description": "通过 Headroom 代理压缩模型上下文，并展示 Headroom 节省的 token。",
+  "description_i18n": {
+    "zh-CN": "通过 Headroom 代理压缩模型上下文，并展示 Headroom 节省的 token。",
+    "en-US": "Route model context through the Headroom proxy and watch the saved tokens."
+  },
+  "author": "Ligandlly",
+  "entry": {
+    "backend": "plugin.py",
+    "frontend": "frontend/dist/index.js"
+  },
+  "dependencies": [],
+  "qwenpaw_version": {
+    "min": "2.2.2",
+    "max": "2.9.9"
+  },
+  "meta": {
+    "category": "productivity",
+    "icon": "🗜️"
+  }
+}
