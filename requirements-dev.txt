@@ -1,0 +1,5 @@
+# Development-only dependencies. The plugin itself needs none of these at
+# runtime: the backend is stdlib-only and FastAPI/QwenPaw come from the host.
+pytest>=8.0
+fastapi>=0.110
+httpx>=0.27
