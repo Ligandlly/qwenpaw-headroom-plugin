@@ -1,5 +1,9 @@
 # Headroom 上下文压缩插件（QwenPaw）
 
+[![CI](https://github.com/Ligandlly/qwenpaw-headroom-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/Ligandlly/qwenpaw-headroom-plugin/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Ligandlly/qwenpaw-headroom-plugin?label=offline%20package)](https://github.com/Ligandlly/qwenpaw-headroom-plugin/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 把 QwenPaw 的模型请求接到 [Headroom](https://github.com/headroom-ai) 压缩代理上，并在控制台里加一个
 「Headroom 节省」页面，实时展示代理替你省下了多少 token / 多少钱、命中了哪些压缩层、每个 agent 的贡献，
 以及当前流量到底走没走代理。
@@ -56,13 +60,19 @@ cp -r ~/projects/qwenpaw-headroom-plugin ~/.qwenpaw/plugins/headroom
 
 ### 3.2 离线（内网机器）
 
-```bash
-# 在有网的机器上
-python3 scripts/package_offline.py --out-dir release
-# 产物：release/headroom-plugin-1.0.0.zip + .sha256
+从 [Releases](https://github.com/Ligandlly/qwenpaw-headroom-plugin/releases/latest)
+下载 `headroom-plugin-<version>.zip`（每个 tag 自动构建并附 sha256）：
 
-# 拷到内网机器后（先改配置里的地址，见第 4 节）
-unzip headroom-plugin-1.0.0.zip -d ~/.qwenpaw/plugins/
+```bash
+sha256sum -c headroom-plugin-*.zip.sha256      # 先验签
+unzip headroom-plugin-*.zip -d ~/.qwenpaw/plugins/
+vi ~/.qwenpaw/plugins/headroom/headroom.config.json   # 改 base_url 指向内网代理
+```
+
+也可以在任意机器上自己打一份（构建可复现，哈希与 Release 一致）：
+
+```bash
+python3 scripts/package_offline.py --out-dir release
 ```
 
 zip 里的顶层目录就是 `headroom/`，解压后即 `~/.qwenpaw/plugins/headroom/`。
@@ -229,6 +239,32 @@ python3 -m pytest tests -q
 
 ---
 
-## 10. License
+## 10. 开发与发布
+
+```bash
+python3 -m pip install -r requirements-dev.txt   # 仅开发/测试需要
+python3 -m pytest tests -q                        # 84 项
+node --input-type=module -e "$(cat frontend/dist/index.js)"   # 前端语法自检
+```
+
+GitHub Actions：
+
+| 工作流 | 触发 | 做什么 |
+| --- | --- | --- |
+| `CI` | push / PR | Python 3.10–3.13 跑全量测试、构建离线包、校验前端、检查清单（禁止 `sdk` 键、后端仅标准库）、双次构建比对哈希 |
+| `Release offline package` | 推 `v*` tag（或手动触发） | 跑测试 → 校验 tag 与 `plugin.json` 版本一致 → 构建 → 冒烟 → 发布 zip + sha256 到 Release |
+
+发版只需三步：
+
+```bash
+# 1. 改 plugin.json 的 version（例如 1.1.0）
+git commit -am "chore: release 1.1.0"
+git push
+git tag -a v1.1.0 -m "v1.1.0" && git push origin v1.1.0
+```
+
+tag 与 `plugin.json` 的 `version` 不一致时，发布任务会直接失败。
+
+## 11. License
 
 MIT，见 `LICENSE`。
